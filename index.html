@@ -3,867 +3,442 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Intelligence — Survey Intel Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Survey Intelligence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{
-  --bg:#fafaf8;--surface:#fff;--s2:#f4f3f0;--s3:#edece8;
-  --border:#e8e6e0;--border2:#d4d1c8;
-  --text:#1a1916;--t2:#5a5750;--t3:#9a9790;
-  --g:#2d6a4f;--gbg:#edf4f0;
-  --b:#2563a8;--bbg:#eff5fc;
-  --o:#c05621;--obg:#fdf0e8;
-  --p:#9d2d5e;
-  --tl:#1a6b73;--tlbg:#eef8f9;
-  --am:#92610a;--ambg:#fdf8ee;
-  --sans:'IBM Plex Sans Thai','Sarabun',sans-serif;
-  --mono:'IBM Plex Mono',monospace;
-  --sw:228px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;}
-
-/* ── TOP ── */
-.top{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;height:52px;gap:16px;}
-.top-logo{font-family:var(--mono);font-size:12px;color:var(--t3);letter-spacing:.05em;white-space:nowrap;}
-.top-logo b{color:var(--g);font-weight:500;}
-.top-tabs{display:flex;gap:2px;}
-.top-tab{font-size:12px;padding:5px 14px;border-radius:6px;cursor:pointer;color:var(--t2);border:none;background:none;font-family:var(--sans);transition:background .15s,color .15s;}
-.top-tab:hover{background:var(--s2);}
-.top-tab.active{background:var(--gbg);color:var(--g);font-weight:500;}
-.top-meta{font-size:11px;color:var(--t3);white-space:nowrap;}
-
-/* ── LAYOUT ── */
-.layout{display:flex;min-height:100vh;}
-
-/* ── SIDEBAR ── */
-.sidebar{width:var(--sw);flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;background:var(--surface);border-right:1px solid var(--border);padding:24px 0;}
-.sb-section{padding:0 16px;margin-bottom:4px;}
-.sb-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);font-weight:500;padding:6px 0 4px;display:block;}
-.sb-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;text-decoration:none;font-size:13px;color:var(--t2);transition:background .15s,color .15s;margin-bottom:1px;cursor:pointer;}
-.sb-link:hover{background:var(--s2);color:var(--text);}
-.sb-link.active{background:var(--gbg);color:var(--g);font-weight:500;}
-.sb-ico{font-size:14px;flex-shrink:0;}
-.sb-div{height:1px;background:var(--border);margin:10px 16px;}
-.sb-badge{margin-left:auto;font-size:10px;font-family:var(--mono);background:var(--s2);color:var(--t3);padding:1px 6px;border-radius:10px;}
-
-/* ── FILTER PILLS ── */
-.filter-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
-.fpill{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:13px;color:var(--t2);transition:all .15s;}
-.fpill:hover{border-color:var(--g);color:var(--g);}
-.fpill.active{background:var(--gbg);border-color:var(--g);color:var(--g);font-weight:500;}
-.fpill .fc{font-family:var(--mono);font-size:11px;color:var(--t3);}
-.fpill.active .fc{color:var(--g);opacity:.7;}
-
-/* ── MAIN ── */
-.main{flex:1;min-width:0;}
-.hero{background:var(--surface);border-bottom:1px solid var(--border);padding:44px 44px 36px;}
-.hero-eye{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g);font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.hero-eye::before{content:'';display:inline-block;width:16px;height:2px;background:var(--g);}
-.hero-title{font-size:34px;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin-bottom:6px;}
-.hero-sub{font-size:14px;color:var(--t2);margin-bottom:28px;}
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.kpi{background:var(--surface);padding:18px 20px;}
-.kpi-val{font-size:26px;font-weight:600;font-family:var(--mono);line-height:1;color:var(--text);margin-bottom:3px;}
-.kpi-val.g{color:var(--g);}.kpi-val.b{color:var(--b);}.kpi-val.o{color:var(--o);}
-.kpi-lbl{font-size:11px;color:var(--t3);}
-
-.section{padding:44px 44px;border-bottom:1px solid var(--border);}
-.sh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
-.snum{font-size:10px;font-family:var(--mono);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
-.stitle{font-size:22px;font-weight:600;letter-spacing:-.01em;line-height:1.2;}
-.sdesc{font-size:13px;color:var(--t3);max-width:260px;text-align:right;line-height:1.6;margin-top:4px;}
-
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
-
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;}
-.sc-lbl{font-size:11px;color:var(--t3);letter-spacing:.04em;margin-bottom:6px;}
-.sc-val{font-size:34px;font-weight:600;font-family:var(--mono);line-height:1;color:var(--text);margin-bottom:4px;}
-.sc-val.g{color:var(--g);}.sc-val.b{color:var(--b);}.sc-val.o{color:var(--o);}
-.sc-sub{font-size:12px;color:var(--t3);line-height:1.5;}
-
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px;margin-bottom:16px;}
-.panel:last-child{margin-bottom:0;}
-.pt{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
-.ps{font-size:12px;color:var(--t3);margin-bottom:16px;}
-
-.ins{border-left:3px solid var(--g);background:var(--gbg);border-radius:0 8px 8px 0;padding:11px 14px;font-size:13px;color:var(--t2);line-height:1.7;margin-top:14px;}
-.ins.b{border-color:var(--b);background:var(--bbg);}
-.ins.o{border-color:var(--o);background:var(--obg);}
-.ins.am{border-color:var(--am);background:var(--ambg);}
-.ins.tl{border-color:var(--tl);background:var(--tlbg);}
-
-/* ── SEGMENT CARDS ── */
-.seg-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
-.seg-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.seg-card-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);}
-.seg-card-icon{font-size:22px;margin-bottom:6px;}
-.seg-card-name{font-size:16px;font-weight:600;margin-bottom:2px;}
-.seg-card-count{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1;margin-bottom:2px;}
-.seg-card-pct{font-size:12px;color:var(--t3);}
-.seg-card-body{padding:16px 20px;}
-.seg-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;}
-.seg-row:last-child{border-bottom:none;}
-.seg-row-lbl{color:var(--t2);}
-.seg-row-val{font-family:var(--mono);font-size:13px;font-weight:500;}
-
-/* ── BEHAVIORAL SIGNALS ── */
-.signals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
-.sig-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;}
-.sig-title{font-size:13px;font-weight:600;margin-bottom:14px;}
-.sig-metric{margin-bottom:10px;}
-.sig-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:4px;}
-.sig-track{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;}
-.sig-fill{height:100%;border-radius:3px;transition:width 1s ease;}
-
-/* ── HBAR ── */
-.hbg{display:flex;flex-direction:column;gap:9px;}
-.hbr{display:flex;align-items:center;gap:10px;}
-.hbl{font-size:13px;color:var(--t2);width:88px;flex-shrink:0;text-align:right;}
-.hbl.sm{width:68px;font-size:12px;}
-.hbt{flex:1;height:7px;background:var(--s2);border-radius:4px;overflow:hidden;}
-.hbf{height:100%;border-radius:4px;transition:width 1s ease;}
-.hbp{font-size:12px;color:var(--t3);font-family:var(--mono);width:44px;}
-.hbn{font-size:12px;color:var(--t3);font-family:var(--mono);}
-
-/* ── FREQUENCY ── */
-.freq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;}
-.freq-item{background:var(--surface);padding:18px 16px;}
-.freq-pct{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
-.freq-label{font-size:13px;font-weight:500;margin-bottom:2px;}
-.freq-n{font-family:var(--mono);font-size:12px;color:var(--t3);}
-.freq-bar{height:4px;border-radius:2px;margin-top:10px;transition:width 1s;}
-
-/* ── TOPIC BARS ── */
-.topic-list{display:flex;flex-direction:column;gap:7px;}
-.topic-row{display:flex;align-items:center;gap:10px;}
-.topic-ico{width:22px;text-align:center;font-size:14px;flex-shrink:0;}
-.topic-lbl{font-size:13px;color:var(--t2);width:110px;flex-shrink:0;}
-.topic-track{flex:1;height:7px;background:var(--s2);border-radius:4px;overflow:hidden;}
-.topic-fill{height:100%;border-radius:4px;transition:width 1s ease;}
-.topic-n{font-family:var(--mono);font-size:12px;color:var(--t3);width:52px;text-align:right;}
-
-/* ── FUNNEL ── */
-.funnel{display:flex;flex-direction:column;gap:0;margin-bottom:14px;}
-.funnel-step{display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px dashed var(--border);}
-.funnel-step:last-child{border-bottom:none;}
-.funnel-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.funnel-lbl{flex:1;font-size:14px;color:var(--t2);}
-.funnel-n{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);}
-.funnel-pct{font-family:var(--mono);font-size:12px;color:var(--t3);margin-left:4px;}
-.funnel-bar-wrap{width:120px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden;}
-.funnel-bar-fill{height:100%;border-radius:3px;transition:width 1s;}
-.funnel-arrow{text-align:center;color:var(--t3);font-size:12px;padding:2px 0 2px 26px;}
-
-/* ── TIERS ── */
-.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
-.tier-card{border-radius:10px;padding:20px;border:1px solid;}
-.tier-gold  {background:#fffbeb;border-color:#fcd34d;}
-.tier-silver{background:#f8fafc;border-color:#cbd5e1;}
-.tier-bronze{background:#fff7f3;border-color:#fdba74;}
-.tier-icon{font-size:22px;margin-bottom:8px;}
-.tier-n{font-family:var(--mono);font-size:32px;font-weight:700;line-height:1;margin-bottom:4px;}
-.tier-lbl{font-size:13px;font-weight:600;margin-bottom:4px;}
-.tier-sub{font-size:12px;color:var(--t3);line-height:1.5;}
-
-/* ── SCENARIO ── */
-.scenario{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
-.scenario-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;}
-.scenario-label{font-size:11px;color:var(--t3);letter-spacing:.04em;margin-bottom:6px;}
-.scenario-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;}
-.scenario-sub{font-size:12px;color:var(--t3);}
-.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.outcome-item{border-radius:8px;padding:14px;text-align:center;}
-.outcome-go{background:var(--gbg);border:1px solid #a3cfb8;}
-.outcome-iter{background:var(--ambg);border:1px solid #e8c97a;}
-.outcome-nogo{background:#fff0f0;border:1px solid #fca5a5;}
-.outcome-icon{font-size:18px;margin-bottom:4px;}
-.outcome-lbl{font-size:13px;font-weight:600;}
-.outcome-cond{font-size:11px;color:var(--t3);}
-
-/* ── DATA NOTE ── */
-.dnote{display:flex;align-items:flex-start;gap:10px;background:var(--ambg);border:1px solid #e6c56d;border-radius:8px;padding:11px 14px;font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px;}
-
-/* ── TAG ── */
-.tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
-.tc{background:var(--obg);color:var(--o);}
-.tr2{background:var(--bbg);color:var(--b);}
-.tt{background:var(--tlbg);color:var(--tl);}
-
-/* ── GAP CARDS ── */
-.gap-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
-.gap-c{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;}
-.gap-val{font-family:var(--mono);font-size:38px;font-weight:700;line-height:1;margin:8px 0 4px;}
-.gap-unit{font-size:13px;font-weight:400;color:var(--t3);}
-
-/* ── CHIP ── */
-.chip-g{display:flex;flex-wrap:wrap;gap:7px;}
-.chip{font-size:12px;font-family:var(--mono);padding:4px 11px;border-radius:20px;border:1px solid var(--border2);color:var(--t2);background:var(--surface);white-space:nowrap;transition:border-color .15s,color .15s;cursor:default;}
-.chip-n{color:var(--t3);}
-
-.big-pair{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;}
-.bp{background:var(--surface);padding:26px 28px;}
-.bp-val{font-size:52px;font-weight:700;font-family:var(--mono);line-height:1;margin-bottom:6px;}
-.bp-val.g{color:var(--g);}.bp-val.o{color:var(--o);}
-.bp-lbl{font-size:15px;font-weight:600;margin-bottom:4px;}
-.bp-sub{font-size:13px;color:var(--t3);line-height:1.5;}
-
-.mono{font-family:var(--mono);font-size:13px;}
-.mp{width:68px;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:5px;}
-.mpf{height:100%;border-radius:2px;}
-
-.cw{position:relative;width:100%;}
-.fade{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s;}
-.fade.v{opacity:1;transform:translateY(0);}
-.d1{transition-delay:.06s;}.d2{transition-delay:.12s;}.d3{transition-delay:.18s;}
-
-/* profile mini-stats */
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
-.pstat{background:var(--s2);border-radius:8px;padding:12px 14px;}
-.pstat-lbl{font-size:11px;color:var(--t3);margin-bottom:3px;}
-.pstat-val{font-family:var(--mono);font-size:20px;font-weight:700;}
-
-.footer{background:var(--surface);border-top:1px solid var(--border);padding:22px 44px;display:flex;justify-content:space-between;align-items:center;}
-.footer-note{font-size:12px;color:var(--t3);line-height:1.6;}
-.footer-mono{font-family:var(--mono);font-size:11px;color:var(--t3);}
-
-@media(max-width:960px){
-  .sidebar{display:none;}.section,.hero{padding:28px 18px;}
-  .kpi-row{grid-template-columns:1fr 1fr 1fr;}.kpi:nth-child(n+4){display:none;}
-  .g2,.g3,.g4,.seg-cards,.signals-grid,.gap-g,.tier-grid,.scenario,.outcome-grid,.freq-grid,.overlap-cards{grid-template-columns:1fr;}
-  .big-pair{grid-template-columns:1fr;}.sdesc{display:none;}
-  .top-tabs{display:none;}.top-meta{display:none;}.footer{padding:16px 18px;}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0f1a;--card:#111827;--card2:#1a2234;--border:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--accent:#3b82f6;--teal:#14b8a6;--coral:#f97316;--purple:#a78bfa;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--pink:#ec4899;--gold:#fbbf24;--silver:#9ca3af;--bronze:#d97706}
+body{font-family:'Noto Sans Thai',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;font-size:14px;line-height:1.6}
+.mono{font-family:'Space Mono',monospace}
+nav{position:fixed;left:0;top:0;width:220px;height:100vh;background:#080c16;border-right:1px solid var(--border);padding:24px 16px;z-index:100;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+nav .logo{font-size:15px;font-weight:600;margin-bottom:20px;padding:8px;color:var(--accent)}
+nav .logo span{color:var(--muted);font-weight:400;font-size:12px;display:block;margin-top:2px}
+nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:13px;transition:all .2s}
+nav a:hover,nav a.active{background:var(--card);color:var(--text)}
+nav a .icon{width:20px;text-align:center;font-size:14px;flex-shrink:0}
+main{margin-left:220px;padding:32px 40px 80px}
+section{margin-bottom:64px;scroll-margin-top:20px}
+h2{font-size:22px;font-weight:600;margin-bottom:6px}
+h2 span{color:var(--muted);font-weight:400;font-size:14px;margin-left:8px}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:24px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g5{grid-template-columns:repeat(5,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-sm{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.metric{text-align:center}
+.metric .val{font-size:28px;font-weight:700;font-family:'Space Mono',monospace}
+.metric .label{font-size:12px;color:var(--muted);margin-top:4px}
+.metric .sub{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.insight{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--muted);margin-top:16px;line-height:1.7}
+.insight b{color:var(--text);font-weight:500}
+.bar-h{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:6px 0}
+.bar-h div{height:100%;border-radius:4px;transition:width .8s ease}
+.seg-card{border-top:3px solid;padding:20px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin:2px}
+.table-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.table-row:last-child{border-bottom:none}
+.table-row .k{color:var(--muted)}
+.table-row .v{font-weight:500;font-family:'Space Mono',monospace}
+.chart-wrap{position:relative;height:280px}
+.flow-arrow{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:20px}
+.tier-card{border-left:4px solid;padding:16px 20px;background:var(--card);border-radius:0 10px 10px 0}
+.funnel-step{display:flex;align-items:center;gap:12px;padding:10px 0}
+.funnel-bar{height:32px;border-radius:6px;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:500;transition:width 1s ease}
+.overlap-card{background:var(--card2);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.overlap-num{font-size:24px;font-weight:700;font-family:'Space Mono',monospace}
+.stacked-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;gap:2px}
+.caveat{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:16px}
+@media(max-width:900px){nav{display:none}main{margin-left:0;padding:20px 16px}.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<div class="top">
-  <div class="top-logo">Survey <b>Intelligence</b></div>
-  <div class="top-tabs">
-    <button class="top-tab active" onclick="scrollTo('#overview')">◉ Overview</button>
-    <button class="top-tab" onclick="scrollTo('#segments')">◈ Segments</button>
-    <button class="top-tab" onclick="scrollTo('#retention')">◎ Retention</button>
-    <button class="top-tab" onclick="scrollTo('#topics')">◆ Topics</button>
-    <button class="top-tab" onclick="scrollTo('#targeting')">◐ Targeting</button>
-  </div>
-  <div class="top-meta">Jan 2025 – Dec 2025</div>
-</div>
-
-<div class="layout">
-
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sb-section">
-    <span class="sb-label">Overview</span>
-    <a href="#overview" class="sb-link active"><span class="sb-ico">◉</span> Overview<span class="sb-badge">01</span></a>
-  </div>
-  <div class="sb-div"></div>
-  <div class="sb-section">
-    <span class="sb-label">Segments</span>
-    <a href="#segments" class="sb-link"><span class="sb-ico">◈</span> Segment Overview<span class="sb-badge">02</span></a>
-    <a href="#behavioral" class="sb-link"><span class="sb-ico">⬡</span> Behavioral Signals</a>
-  </div>
-  <div class="sb-div"></div>
-  <div class="sb-section">
-    <span class="sb-label">Behavior</span>
-    <a href="#retention" class="sb-link"><span class="sb-ico">◎</span> Participation<span class="sb-badge">03</span></a>
-    <a href="#time" class="sb-link"><span class="sb-ico">⏱</span> Time &amp; Gap</a>
-    <a href="#quality" class="sb-link"><span class="sb-ico">✦</span> Quality</a>
-  </div>
-  <div class="sb-div"></div>
-  <div class="sb-section">
-    <span class="sb-label">Topics</span>
-    <a href="#topics" class="sb-link"><span class="sb-ico">◆</span> Topic Landscape<span class="sb-badge">04</span></a>
-  </div>
-  <div class="sb-div"></div>
-  <div class="sb-section">
-    <span class="sb-label">Targeting</span>
-    <a href="#targeting" class="sb-link"><span class="sb-ico">◐</span> Qualification Funnel<span class="sb-badge">05</span></a>
-    <a href="#tiers" class="sb-link"><span class="sb-ico">🏅</span> Tiers &amp; Scenario</a>
-  </div>
+<nav>
+  <div class="logo">Survey Intel<span>Jan 2025 – Mar 2026</span></div>
+  <a href="#overview" class="active"><span class="icon">◉</span>Overview</a>
+  <a href="#segments"><span class="icon">◈</span>Segments</a>
+  <a href="#behavioral"><span class="icon">⬡</span>Behavioral Signals</a>
+  <a href="#retention"><span class="icon">◎</span>Retention</a>
+  <a href="#gap"><span class="icon">⏱</span>Gap Analysis</a>
+  <a href="#topics"><span class="icon">◆</span>Topics</a>
+  <a href="#targeting"><span class="icon">◐</span>Targeting</a>
+  <a href="#tiers"><span class="icon">🏅</span>Tiers & Scenario</a>
 </nav>
 
-<div class="main">
+<main>
 
-<!-- HERO -->
-<div class="hero" id="overview">
-  <div class="hero-eye">จาก Survey Data สู่ Actionable Lead List · 59 Campaigns Analyzed</div>
-  <h1 class="hero-title">Consumer Intelligence Dashboard</h1>
-  <p class="hero-sub">ภาพรวม community · engagement · segmentation · targeting pool</p>
-  <div class="kpi-row">
-    <div class="kpi"><div class="kpi-val g">16,557</div><div class="kpi-lbl">Unique Users</div></div>
-    <div class="kpi"><div class="kpi-val">43,719</div><div class="kpi-lbl">Total Events</div></div>
-    <div class="kpi"><div class="kpi-val b">2.6×</div><div class="kpi-lbl">Avg campaigns / คน</div></div>
-    <div class="kpi"><div class="kpi-val">11.1%</div><div class="kpi-lbl">Has Social · 1,841 คน</div></div>
-    <div class="kpi"><div class="kpi-val o">89.7%</div><div class="kpi-lbl">PDPA Explicit · 14,851 คน</div></div>
-  </div>
-</div>
-
-<!-- SEGMENTS -->
-<div class="section" id="segments">
-  <div class="sh">
-    <div><div class="snum">Section 02</div><h2 class="stitle">Segment Overview</h2></div>
-    <div class="sdesc">3 กลุ่มหลักแบ่งตาม behavioral score<br>tester · creator · research</div>
+<!-- ==================== OVERVIEW ==================== -->
+<section id="overview">
+  <div style="margin-bottom:32px">
+    <h2 style="font-size:28px">Consumer Intelligence Dashboard</h2>
+    <div class="subtitle">จาก Survey Data สู่ Actionable Lead List · 59 Campaigns · 13 ไฟล์ · 6-Stage Pipeline</div>
   </div>
 
-  <div class="seg-cards fade">
-    <div class="seg-card">
-      <div class="seg-card-head" style="border-top:3px solid var(--tl);">
-        <div class="seg-card-icon">🧪</div>
-        <div class="seg-card-name" style="color:var(--tl);">Tester</div>
-        <div class="seg-card-count" style="color:var(--tl);">8,180</div>
-        <div class="seg-card-pct">49.4% ของ community</div>
-      </div>
-      <div class="seg-card-body">
-        <div class="seg-row"><span class="seg-row-lbl">Social handle</span><span class="seg-row-val">0.0%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg campaigns</span><span class="seg-row-val">1.0×</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">PDPA explicit</span><span class="seg-row-val">91.9%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">High confidence</span><span class="seg-row-val">0.0%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Completion rate</span><span class="seg-row-val">15.3%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg effort</span><span class="seg-row-val">1.3</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Topic breadth</span><span class="seg-row-val">1.0</span></div>
-      </div>
-    </div>
-    <div class="seg-card">
-      <div class="seg-card-head" style="border-top:3px solid var(--b);">
-        <div class="seg-card-icon">📝</div>
-        <div class="seg-card-name" style="color:var(--b);">Research</div>
-        <div class="seg-card-count" style="color:var(--b);">6,321</div>
-        <div class="seg-card-pct">38.2% ของ community</div>
-      </div>
-      <div class="seg-card-body">
-        <div class="seg-row"><span class="seg-row-lbl">Social handle</span><span class="seg-row-val">4.7%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg campaigns</span><span class="seg-row-val" style="color:var(--b);">3.6×</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">PDPA explicit</span><span class="seg-row-val">86.9%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">High confidence</span><span class="seg-row-val">27.9%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Completion rate</span><span class="seg-row-val" style="color:var(--tl);font-weight:600;">72.1%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg effort</span><span class="seg-row-val" style="color:var(--b);font-weight:600;">33.2</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Topic breadth</span><span class="seg-row-val">2.7</span></div>
-      </div>
-    </div>
-    <div class="seg-card">
-      <div class="seg-card-head" style="border-top:3px solid var(--o);">
-        <div class="seg-card-icon">📢</div>
-        <div class="seg-card-name" style="color:var(--o);">Creator</div>
-        <div class="seg-card-count" style="color:var(--o);">2,056</div>
-        <div class="seg-card-pct">12.4% ของ community</div>
-      </div>
-      <div class="seg-card-body">
-        <div class="seg-row"><span class="seg-row-lbl">Social handle</span><span class="seg-row-val" style="color:var(--o);font-weight:600;">75.0%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg campaigns</span><span class="seg-row-val" style="color:var(--o);">5.1×</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">PDPA explicit</span><span class="seg-row-val">89.6%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">High confidence</span><span class="seg-row-val" style="color:var(--o);font-weight:600;">40.2%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Completion rate</span><span class="seg-row-val">37.3%</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Avg effort</span><span class="seg-row-val">19.7</span></div>
-        <div class="seg-row"><span class="seg-row-lbl">Topic breadth</span><span class="seg-row-val">3.4</span></div>
-      </div>
-    </div>
+  <div class="grid g5" style="margin-bottom:24px">
+    <div class="card metric"><div class="val">16,557</div><div class="label">Unique Users</div></div>
+    <div class="card metric"><div class="val">43,719</div><div class="label">Total Events</div><div class="sub">avg 2.64 ต่อคน</div></div>
+    <div class="card metric"><div class="val">59</div><div class="label">Campaigns</div></div>
+    <div class="card metric"><div class="val" style="color:var(--teal)">89.7%</div><div class="label">PDPA Explicit</div><div class="sub">14,851 คน</div></div>
+    <div class="card metric"><div class="val" style="color:var(--purple)">11.1%</div><div class="label">Has Social</div><div class="sub">1,841 คน</div></div>
   </div>
 
-  <div class="ins fade d1">
-    <strong style="color:var(--b);">Research</strong> เก่งเรื่อง completion 72.1% ·
-    <strong style="color:var(--o);">Creator</strong> เก่งเรื่อง social 75% + frequency 5.1× ·
-    <strong style="color:var(--tl);">Tester</strong> คือ wide base 49% ที่รอ activation — แต่ละกลุ่มใช้งานต่างกันสิ้นเชิง
-  </div>
-</div>
-
-<!-- BEHAVIORAL SIGNALS -->
-<div class="section" id="behavioral">
-  <div class="sh">
-    <div><div class="snum">Section 02b</div><h2 class="stitle">Behavioral Signals</h2></div>
-    <div class="sdesc">เปรียบเทียบ score แต่ละมิติ ระหว่าง 3 segment</div>
+  <div class="grid g4" style="margin-bottom:24px">
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">Open Text</div><div style="font-size:20px;font-weight:600;margin:4px 0">50.2%</div><div style="font-size:11px;color:var(--muted)">ของ events ทั้งหมด</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">Social Content</div><div style="font-size:20px;font-weight:600;margin:4px 0">6.0%</div><div style="font-size:11px;color:var(--muted)">ของ events ทั้งหมด</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">Avg Engagement</div><div style="font-size:20px;font-weight:600;margin:4px 0">4.3%</div><div style="font-size:11px;color:var(--muted)">median 1.7%</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">Avg Completion</div><div style="font-size:20px;font-weight:600;margin:4px 0">39.7%</div><div style="font-size:11px;color:var(--muted)">median 33.3%</div></div>
   </div>
 
-  <div class="signals-grid fade">
-    <div class="sig-card" style="border-top:2px solid var(--tl);">
-      <div class="sig-title" style="color:var(--tl);">🧪 Tester</div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Tester score</span><span class="mono" style="color:var(--tl);">0.447</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="44.7" style="width:0%;background:var(--tl);"></div></div>
+  <!-- Demographics -->
+  <div class="grid g3">
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">Gender</div>
+      <div class="stacked-bar" style="height:20px;margin-bottom:8px">
+        <div style="width:79.2%;background:var(--pink)"></div>
+        <div style="width:18.5%;background:var(--accent)"></div>
+        <div style="width:2.3%;background:var(--muted)"></div>
       </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Creator score</span><span class="mono">0.394</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="39.4" style="width:0%;background:var(--t3);"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Research score</span><span class="mono">0.317</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="31.7" style="width:0%;background:var(--t3);"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Engagement rate</span><span class="mono">1.8%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="2" style="width:0%;background:var(--tl);opacity:.5;"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Completion rate</span><span class="mono">15.3%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="15.3" style="width:0%;background:var(--tl);opacity:.5;"></div></div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--muted)">
+        <span>หญิง 13,116 (79.2%)</span><span>ชาย 3,067 (18.5%)</span>
       </div>
     </div>
-    <div class="sig-card" style="border-top:2px solid var(--b);">
-      <div class="sig-title" style="color:var(--b);">📝 Research</div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Tester score</span><span class="mono">0.569</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="56.9" style="width:0%;background:var(--t3);"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Creator score</span><span class="mono">0.575</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="57.5" style="width:0%;background:var(--t3);"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Research score</span><span class="mono" style="color:var(--b);">0.709</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="70.9" style="width:0%;background:var(--b);"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Engagement rate</span><span class="mono">6.1%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="6.1" style="width:0%;background:var(--b);opacity:.5;"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Completion rate</span><span class="mono" style="color:var(--b);">72.1%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="72.1" style="width:0%;background:var(--b);"></div></div>
-      </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">Age Distribution</div>
+      <div class="chart-wrap" style="height:160px"><canvas id="ageChart"></canvas></div>
     </div>
-    <div class="sig-card" style="border-top:2px solid var(--o);">
-      <div class="sig-title" style="color:var(--o);">📢 Creator</div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Tester score</span><span class="mono">0.497</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="49.7" style="width:0%;background:var(--t3);"></div></div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">Top Provinces</div>
+      <div class="table-row"><span class="k">กรุงเทพมหานคร</span><span class="v">4,636</span></div>
+      <div class="table-row"><span class="k">สมุทรปราการ</span><span class="v">676</span></div>
+      <div class="table-row"><span class="k">นนทบุรี</span><span class="v">649</span></div>
+      <div class="table-row"><span class="k">ปทุมธานี</span><span class="v">521</span></div>
+      <div class="table-row"><span class="k">ชลบุรี</span><span class="v">443</span></div>
+    </div>
+  </div>
+  <div class="insight"><b>Core audience:</b> หญิง 26-45 ปี กทม.+ปริมณฑล — คิดเป็น 57% ของ age distribution</div>
+</section>
+
+<!-- ==================== SEGMENTS ==================== -->
+<section id="segments">
+  <h2>Segment Overview <span>3 กลุ่มหลัก จาก behavioral scoring</span></h2>
+  <div class="subtitle">แบ่งด้วย percentile rank ของ engagement, completion, effort, social, review → คะแนนสูงสุด = primary segment</div>
+
+  <div class="grid g3" style="margin-bottom:24px">
+    <div class="card seg-card" style="border-color:var(--purple)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><span style="font-size:18px">🧪</span> <span style="font-size:16px;font-weight:600">Tester</span></div>
+        <span class="badge" style="background:rgba(167,139,250,.15);color:var(--purple)">49.4%</span>
       </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Creator score</span><span class="mono" style="color:var(--o);">0.693</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="69.3" style="width:0%;background:var(--o);"></div></div>
+      <div class="mono" style="font-size:28px;font-weight:700;margin-bottom:12px">8,180</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">ตอบครั้งเดียว ไม่มี social — ส่วนใหญ่ลุ้นรางวัลแล้วไป</div>
+      <div class="table-row"><span class="k">Social handle</span><span class="v">0.0%</span></div>
+      <div class="table-row"><span class="k">Avg campaigns</span><span class="v">1.0</span></div>
+      <div class="table-row"><span class="k">PDPA explicit</span><span class="v">91.9%</span></div>
+      <div class="table-row"><span class="k">High confidence</span><span class="v">0.0%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">15.3%</span></div>
+      <div class="table-row"><span class="k">Effort score</span><span class="v">1.3</span></div>
+      <div class="table-row"><span class="k">Topic breadth</span><span class="v">1.0</span></div>
+    </div>
+
+    <div class="card seg-card" style="border-color:var(--green)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><span style="font-size:18px">📝</span> <span style="font-size:16px;font-weight:600">Research</span></div>
+        <span class="badge" style="background:rgba(34,197,94,.15);color:var(--green)">38.2%</span>
       </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Research score</span><span class="mono">0.584</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="58.4" style="width:0%;background:var(--t3);"></div></div>
+      <div class="mono" style="font-size:28px;font-weight:700;margin-bottom:12px">6,321</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">เขียน open-text เยอะ ตอบหลาย campaign — "นักเขียนที่เงียบ"</div>
+      <div class="table-row"><span class="k">Social handle</span><span class="v">4.7%</span></div>
+      <div class="table-row"><span class="k">Avg campaigns</span><span class="v">3.6</span></div>
+      <div class="table-row"><span class="k">PDPA explicit</span><span class="v">86.9%</span></div>
+      <div class="table-row"><span class="k">High confidence</span><span class="v">27.9%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">72.1%</span></div>
+      <div class="table-row"><span class="k">Effort score</span><span class="v">33.2</span></div>
+      <div class="table-row"><span class="k">Topic breadth</span><span class="v">2.7</span></div>
+    </div>
+
+    <div class="card seg-card" style="border-color:var(--coral)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><span style="font-size:18px">📢</span> <span style="font-size:16px;font-weight:600">Creator</span></div>
+        <span class="badge" style="background:rgba(249,115,22,.15);color:var(--coral)">12.4%</span>
       </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Engagement rate</span><span class="mono" style="color:var(--o);">8.6%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="8.6" style="width:0%;background:var(--o);opacity:.7;"></div></div>
-      </div>
-      <div class="sig-metric">
-        <div class="sig-lbl"><span>Completion rate</span><span class="mono">37.3%</span></div>
-        <div class="sig-track"><div class="sig-fill" data-w="37.3" style="width:0%;background:var(--o);opacity:.7;"></div></div>
-      </div>
+      <div class="mono" style="font-size:28px;font-weight:700;margin-bottom:12px">2,056</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">75% มี social, 59% เคยรีวิว — พร้อมสร้าง content</div>
+      <div class="table-row"><span class="k">Social handle</span><span class="v">75.0%</span></div>
+      <div class="table-row"><span class="k">Avg campaigns</span><span class="v">5.1</span></div>
+      <div class="table-row"><span class="k">PDPA explicit</span><span class="v">89.6%</span></div>
+      <div class="table-row"><span class="k">High confidence</span><span class="v">40.2%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">37.3%</span></div>
+      <div class="table-row"><span class="k">Effort score</span><span class="v">19.7</span></div>
+      <div class="table-row"><span class="k">Topic breadth</span><span class="v">3.4</span></div>
+    </div>
+  </div>
+  <div class="insight"><b>Research</b> เก่งเรื่อง completion 72.1% · <b>Creator</b> เก่งเรื่อง social 75% + frequency 5.1× · <b>Tester</b> คือ wide base 49% ที่รอ activation — แต่ละกลุ่มใช้งานต่างกันสิ้นเชิง</div>
+</section>
+
+<!-- ==================== BEHAVIORAL SIGNALS ==================== -->
+<section id="behavioral">
+  <h2>Behavioral Signals <span>Score comparison + segment overlap</span></h2>
+  <div class="subtitle">เปรียบเทียบ score แต่ละมิติ ระหว่าง 3 segments</div>
+
+  <div class="grid g3" style="margin-bottom:24px">
+    <div class="card" style="border-top:3px solid var(--purple)">
+      <div style="font-size:14px;font-weight:500;margin-bottom:14px">🧪 Tester Scores</div>
+      <div class="table-row"><span class="k">Tester score</span><span class="v">0.447</span></div>
+      <div class="table-row"><span class="k">Creator score</span><span class="v">0.394</span></div>
+      <div class="table-row"><span class="k">Research score</span><span class="v">0.317</span></div>
+      <div class="table-row"><span class="k">Engagement rate</span><span class="v">1.8%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">15.3%</span></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div style="font-size:14px;font-weight:500;margin-bottom:14px">📝 Research Scores</div>
+      <div class="table-row"><span class="k">Tester score</span><span class="v">0.569</span></div>
+      <div class="table-row"><span class="k">Creator score</span><span class="v">0.575</span></div>
+      <div class="table-row"><span class="k">Research score</span><span class="v">0.709</span></div>
+      <div class="table-row"><span class="k">Engagement rate</span><span class="v">6.1%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">72.1%</span></div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--coral)">
+      <div style="font-size:14px;font-weight:500;margin-bottom:14px">📢 Creator Scores</div>
+      <div class="table-row"><span class="k">Tester score</span><span class="v">0.497</span></div>
+      <div class="table-row"><span class="k">Creator score</span><span class="v">0.693</span></div>
+      <div class="table-row"><span class="k">Research score</span><span class="v">0.584</span></div>
+      <div class="table-row"><span class="k">Engagement rate</span><span class="v">8.6%</span></div>
+      <div class="table-row"><span class="k">Completion rate</span><span class="v">37.3%</span></div>
     </div>
   </div>
 
-  <!-- Overlap -->
-  <div class="panel fade d1">
-    <div class="pt">Segment Overlap — Secondary behavior</div>
-    <div class="ps">คน 1 คนมี primary + secondary segment — นี่คือ untapped potential</div>
-    <div class="g3" style="margin-bottom:0;">
-      <div class="sc" style="border-color:#f0c9b0;">
-        <div style="margin-bottom:8px;"><span class="tag tt">Tester</span> <span style="color:var(--t3);">→</span> <span class="tag tc">Creator</span></div>
-        <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--o);">7,083</div>
-        <div style="font-size:12px;color:var(--t3);">คน Tester ที่มี Creator เป็น secondary<br>potential ที่ยังไม่ถูก unlock</div>
+  <div style="font-size:14px;font-weight:500;margin-bottom:12px">Segment Overlap — Secondary behavior</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">1 คนมี primary + secondary segment — นี่คือ untapped potential ที่รอ upgrade</div>
+  <div class="grid g3">
+    <div class="overlap-card"><div class="overlap-num" style="color:var(--purple)">7,083</div><div><div style="font-size:13px;font-weight:500">Tester → Creator</div><div style="font-size:11px;color:var(--muted)">Tester ที่มี Creator เป็น secondary — potential ที่รอ unlock</div></div></div>
+    <div class="overlap-card"><div class="overlap-num" style="color:var(--green)">2,414</div><div><div style="font-size:13px;font-weight:500">Research → Tester</div><div style="font-size:11px;color:var(--muted)">Research ที่มี Tester เป็น secondary</div></div></div>
+    <div class="overlap-card"><div class="overlap-num" style="color:var(--coral)">1,409</div><div><div style="font-size:13px;font-weight:500">Creator → Research</div><div style="font-size:11px;color:var(--muted)">Creator ที่มี Research เป็น secondary</div></div></div>
+  </div>
+</section>
+
+<!-- ==================== RETENTION ==================== -->
+<section id="retention">
+  <h2>Retention & Participation <span>ความถี่ + power user signal</span></h2>
+
+  <div class="grid g2" style="margin-bottom:24px">
+    <div class="card metric" style="border-left:4px solid var(--red)"><div class="val" style="color:var(--red)">64.9%</div><div class="label">One-time users</div><div class="sub">10,751 คน ลองครั้งเดียวแล้วหาย</div></div>
+    <div class="card metric" style="border-left:4px solid var(--green)"><div class="val" style="color:var(--green)">35.1%</div><div class="label">Repeat users</div><div class="sub">5,806 คน กลับมา >1 ครั้ง</div></div>
+  </div>
+
+  <div class="grid g4" style="margin-bottom:24px">
+    <div class="card-sm"><div style="font-size:11px;color:var(--muted)">1 ครั้ง</div><div class="bar-h"><div style="width:100%;background:var(--red)"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:18px;font-weight:700">64.9%</span><span style="font-size:12px;color:var(--muted)">10,751</span></div></div>
+    <div class="card-sm"><div style="font-size:11px;color:var(--muted)">2-3 ครั้ง</div><div class="bar-h"><div style="width:30%;background:var(--amber)"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:18px;font-weight:700">19.4%</span><span style="font-size:12px;color:var(--muted)">3,210</span></div></div>
+    <div class="card-sm"><div style="font-size:11px;color:var(--muted)">4-9 ครั้ง</div><div class="bar-h"><div style="width:15%;background:var(--green)"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:18px;font-weight:700">9.6%</span><span style="font-size:12px;color:var(--muted)">1,595</span></div></div>
+    <div class="card-sm"><div style="font-size:11px;color:var(--muted)">10+ ครั้ง</div><div class="bar-h"><div style="width:9%;background:var(--accent)"></div></div><div style="display:flex;justify-content:space-between"><span style="font-size:18px;font-weight:700">6.0%</span><span style="font-size:12px;color:var(--muted)">1,001</span></div></div>
+  </div>
+
+  <div class="insight" style="margin-bottom:24px"><b>เปลี่ยนแค่ 10%</b> ของกลุ่มตอบครั้งเดียว = +1,075 คน — มากกว่า Creator ทั้ง segment (2,056 คน) เกินครึ่ง</div>
+
+  <!-- Power Users -->
+  <div style="font-size:14px;font-weight:500;margin-bottom:12px">Power Users vs Casual</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Top 10% (≥6 campaigns) = 1,701 คน generate เกือบครึ่งของ interactions ทั้งระบบ</div>
+  <div class="grid g2">
+    <div class="card" style="border-left:4px solid var(--accent)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:500">Top 10% · 1,701 คน</span><span class="mono" style="font-size:20px;color:var(--accent)">48.0%</span></div>
+      <div style="font-size:12px;color:var(--muted)">ของ events ทั้งหมด</div>
+      <div class="table-row"><span class="k">Avg campaigns</span><span class="v">11.7</span></div>
+      <div class="table-row"><span class="k">Engagement</span><span class="v">19.7%</span></div>
+      <div class="table-row"><span class="k">Completion</span><span class="v">57.6%</span></div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:500">Bottom 90% · 14,856 คน</span><span class="mono" style="font-size:20px;color:var(--muted)">52.0%</span></div>
+      <div style="font-size:12px;color:var(--muted)">ของ events ทั้งหมด</div>
+      <div class="table-row"><span class="k">Avg campaigns</span><span class="v">1.5</span></div>
+      <div class="table-row"><span class="k">Engagement</span><span class="v">2.5%</span></div>
+      <div class="table-row"><span class="k">Completion</span><span class="v">37.7%</span></div>
+    </div>
+  </div>
+  <div class="insight">Power users (1,001 คน · 10+ campaigns): <b>Research 628</b> (63%) · <b>Creator 373</b> (37%) · <b>Tester 0</b> (0%) — ไม่มี Tester สักคนในกลุ่มนี้ คนที่ลงลึกจริงจะ upgrade เสมอ</div>
+</section>
+
+<!-- ==================== GAP ANALYSIS ==================== -->
+<section id="gap">
+  <h2>Gap Day Analysis <span>ระยะห่างระหว่างการกลับมาตอบ</span></h2>
+  <div class="caveat">⚠ วิเคราะห์จาก 29% ของ events ที่มี date (Jan-Aug 2025) = 2,390 users ที่ตอบ 2+ ครั้ง</div>
+
+  <div class="grid g4" style="margin-bottom:24px">
+    <div class="card metric"><div class="val">24.3</div><div class="label">Mean gap (วัน)</div></div>
+    <div class="card metric"><div class="val">2</div><div class="label">Median gap (วัน)</div></div>
+    <div class="card metric"><div class="val" style="color:var(--red)">64%</div><div class="label">กลับมาช้าลง</div></div>
+    <div class="card metric"><div class="val" style="color:var(--green)">32%</div><div class="label">กลับมาเร็วขึ้น</div></div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:24px">
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">First gap distribution (1st → 2nd response)</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="gapChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:12px">Gap acceleration (605 users, 3+ visits)</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div class="card-sm" style="flex:1;text-align:center"><div style="font-size:11px;color:var(--muted)">1st gap</div><div class="mono" style="font-size:22px;font-weight:700">20.1</div></div>
+        <span style="color:var(--muted)">→</span>
+        <div class="card-sm" style="flex:1;text-align:center"><div style="font-size:11px;color:var(--muted)">mid gaps</div><div class="mono" style="font-size:22px;font-weight:700">26.5</div></div>
+        <span style="color:var(--muted)">→</span>
+        <div class="card-sm" style="flex:1;text-align:center"><div style="font-size:11px;color:var(--muted)">last gap</div><div class="mono" style="font-size:22px;font-weight:700;color:var(--red)">44.8</div></div>
       </div>
-      <div class="sc" style="border-color:#b3cef5;">
-        <div style="margin-bottom:8px;"><span class="tag tr2">Research</span> <span style="color:var(--t3);">→</span> <span class="tag tt">Tester</span></div>
-        <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--b);">2,414</div>
-        <div style="font-size:12px;color:var(--t3);">คน Research ที่มี Tester เป็น secondary</div>
+      <div class="stacked-bar" style="height:20px;margin-bottom:8px">
+        <div style="width:32%;background:var(--green)"></div>
+        <div style="width:4%;background:var(--muted)"></div>
+        <div style="width:64%;background:var(--red)"></div>
       </div>
-      <div class="sc" style="border-color:#9fd9d2;">
-        <div style="margin-bottom:8px;"><span class="tag tc">Creator</span> <span style="color:var(--t3);">→</span> <span class="tag tr2">Research</span></div>
-        <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--tl);">1,409</div>
-        <div style="font-size:12px;color:var(--t3);">คน Creator ที่มี Research เป็น secondary</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- RETENTION / PARTICIPATION -->
-<div class="section" id="retention">
-  <div class="sh">
-    <div><div class="snum">Section 03</div><h2 class="stitle">Retention &amp; Participation</h2></div>
-    <div class="sdesc">ความถี่การตอบ + power user signal</div>
-  </div>
-
-  <div class="big-pair fade">
-    <div class="bp"><div class="bp-val o">64.9%</div><div class="bp-lbl">One-time users</div><div class="bp-sub">10,751 คน ลองครั้งเดียวแล้วหาย — churn signal</div></div>
-    <div class="bp"><div class="bp-val g">35.1%</div><div class="bp-lbl">Repeat users</div><div class="bp-sub">5,806 คน กลับมา >1 ครั้ง — retention core</div></div>
-  </div>
-
-  <div class="freq-grid fade d1">
-    <div class="freq-item">
-      <div class="freq-pct" style="color:var(--o);">64.9%</div>
-      <div class="freq-label">1 ครั้ง</div>
-      <div class="freq-n">10,751 คน</div>
-      <div class="freq-bar" data-w="64.9" style="width:0%;background:var(--o);"></div>
-    </div>
-    <div class="freq-item">
-      <div class="freq-pct" style="color:var(--am);">19.4%</div>
-      <div class="freq-label">2–3 ครั้ง</div>
-      <div class="freq-n">3,210 คน</div>
-      <div class="freq-bar" data-w="19.4" style="width:0%;background:var(--am);"></div>
-    </div>
-    <div class="freq-item">
-      <div class="freq-pct" style="color:var(--b);">9.6%</div>
-      <div class="freq-label">4–9 ครั้ง</div>
-      <div class="freq-n">1,595 คน</div>
-      <div class="freq-bar" data-w="9.6" style="width:0%;background:var(--b);"></div>
-    </div>
-    <div class="freq-item">
-      <div class="freq-pct" style="color:var(--g);">6.0%</div>
-      <div class="freq-label">10+ ครั้ง</div>
-      <div class="freq-n">1,001 คน</div>
-      <div class="freq-bar" data-w="6.0" style="width:0%;background:var(--g);"></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>เร็วขึ้น 32%</span><span>คงที่ 4%</span><span>ช้าลง 64%</span></div>
     </div>
   </div>
 
-  <div class="ins o fade d2">
-    💡 <strong>เปลี่ยนแค่ 10%</strong> ของกลุ่มตอบครั้งเดียว = +1,075 คน — มากกว่า Creator ทั้ง segment (2,056 คน) เกินครึ่ง
+  <div style="font-size:14px;font-weight:500;margin-bottom:12px">Gap by segment</div>
+  <div class="grid g3">
+    <div class="card-sm" style="border-left:3px solid var(--green)"><div style="font-size:13px;font-weight:500">Research (n=1,114)</div><div class="mono" style="font-size:22px;font-weight:700;margin:4px 0">0 วัน</div><div style="font-size:11px;color:var(--muted)">median · mean 15.7d — กวาดหลาย campaign วันเดียว</div></div>
+    <div class="card-sm" style="border-left:3px solid var(--purple)"><div style="font-size:13px;font-weight:500">Tester (n=44)</div><div class="mono" style="font-size:22px;font-weight:700;margin:4px 0">5 วัน</div><div style="font-size:11px;color:var(--muted)">median · mean 27.6d — sample น้อย</div></div>
+    <div class="card-sm" style="border-left:3px solid var(--coral)"><div style="font-size:13px;font-weight:500">Creator (n=912)</div><div class="mono" style="font-size:22px;font-weight:700;margin:4px 0">27 วัน</div><div style="font-size:11px;color:var(--muted)">median · mean 34.7d — รอ campaign ที่ตรงใจ</div></div>
   </div>
+  <div class="insight">Mean ≠ Median ต่างกัน <b>12 เท่า</b> → Bimodal: กลับเร็วมาก หรือหายไปนาน ไม่มีระหว่างกลาง</div>
+</section>
 
-  <!-- Power users -->
-  <div class="panel fade d2" style="margin-top:14px;">
-    <div class="pt">Power Users vs Casual</div>
-    <div class="ps">Top 10% (≥ 6 ครั้ง) generate interactions ส่วนใหญ่ของระบบ</div>
-    <div class="g2" style="margin-bottom:0;">
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-          <span style="font-size:13px;color:var(--t2);">Top 10% · 1,701 คน</span>
-          <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--o);">47.5%</span>
-        </div>
-        <div style="height:10px;background:var(--s2);border-radius:5px;overflow:hidden;margin-bottom:12px;">
-          <div class="hbf" data-w="47.5" style="width:0%;background:var(--o);height:100%;border-radius:5px;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-          <span style="font-size:13px;color:var(--t2);">Bottom 90% · 14,856 คน</span>
-          <span style="font-family:var(--mono);font-size:14px;color:var(--t3);">52.5%</span>
-        </div>
-        <div style="height:10px;background:var(--s2);border-radius:5px;overflow:hidden;">
-          <div style="width:52.5%;background:var(--border2);height:100%;border-radius:5px;"></div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div style="background:var(--obg);border:1px solid #f0c9b0;border-radius:8px;padding:14px;">
-          <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Power avg</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--o);">11.7×</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:3px;">eng 19.7% · comp 57.6%</div>
-        </div>
-        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-          <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Casual avg</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--t2);">1.5×</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:3px;">eng 2.5% · comp 37.7%</div>
-        </div>
-      </div>
+<!-- ==================== TOPICS ==================== -->
+<section id="topics">
+  <h2>Topic Landscape <span>16 topics · 43,708 events</span></h2>
+
+  <div class="grid g2" style="margin-bottom:24px">
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:14px">Events per topic</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="topicChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:14px">Top topics</div>
+      <div class="table-row"><span class="k">🍔 Food</span><span class="v">12,162</span></div>
+      <div class="table-row"><span class="k">💊 Health</span><span class="v">8,329</span></div>
+      <div class="table-row"><span class="k">✨ Beauty</span><span class="v">6,939</span></div>
+      <div class="table-row"><span class="k">🌐 Mixed</span><span class="v">3,039</span></div>
+      <div class="table-row"><span class="k">📱 Social</span><span class="v">2,982</span></div>
+      <div class="table-row"><span class="k">💻 Tech</span><span class="v">2,802</span></div>
+      <div class="table-row"><span class="k">🎬 Entertainment</span><span class="v">1,948</span></div>
+      <div class="table-row"><span class="k">💰 Finance</span><span class="v">1,147</span></div>
+      <div class="table-row"><span class="k">🏡 Lifestyle</span><span class="v">1,069</span></div>
+
+      <div style="font-size:14px;font-weight:500;margin:18px 0 10px;color:var(--coral)">Beauty — Social & Review Signal</div>
+      <div class="table-row"><span class="k">Social rate</span><span class="v" style="color:var(--coral)">17.2%</span></div>
+      <div class="table-row"><span class="k">Review rate</span><span class="v" style="color:var(--coral)">15.7%</span></div>
+      <div class="table-row"><span class="k">Open text rate</span><span class="v" style="color:var(--coral)">64.4%</span></div>
     </div>
   </div>
-</div>
+  <div class="insight"><b>Beauty</b> มี social 17.2% + review 15.7% + open text 64.4% สูงสุดใน topic ทั้งหมด — แม้ events จะเป็นอันดับ 3 แต่ engagement สูงสุด เหมาะที่สุดสำหรับ product testing & review campaign</div>
+</section>
 
-<!-- TIME & GAP -->
-<div class="section" id="time">
-  <div class="sh">
-    <div><div class="snum">Section 03b</div><h2 class="stitle">Gap Analysis</h2></div>
-    <div class="sdesc">ระยะห่างระหว่าง session — foundation ของ CRM</div>
+<!-- ==================== TARGETING ==================== -->
+<section id="targeting">
+  <h2>Skincare Use Case · Targeting <span>Qualification funnel</span></h2>
+  <div class="subtitle">สร้าง pool ใหม่ข้าม segment — filter เฉพาะคนที่มีประสบการณ์ Beauty + เขียน open-text ใน Beauty campaign จริงๆ</div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="font-size:14px;font-weight:500;margin-bottom:16px">Qualification Funnel · Beauty Campaign</div>
+    <div class="funnel-step"><div class="funnel-bar" style="width:100%;background:rgba(59,130,246,.15);color:var(--accent)">16,557 ทั้งหมด</div><span style="font-size:11px;color:var(--muted)">100%</span></div>
+    <div class="funnel-step"><div class="funnel-bar" style="width:67%;background:rgba(59,130,246,.2);color:var(--accent)">4,430 Beauty campaign</div><span style="font-size:11px;color:var(--muted)">26.8%</span></div>
+    <div class="funnel-step"><div class="funnel-bar" style="width:51%;background:rgba(59,130,246,.25);color:var(--accent)">3,391 + PDPA explicit</div><span style="font-size:11px;color:var(--muted)">20.5%</span></div>
+    <div class="funnel-step"><div class="funnel-bar" style="width:32%;background:rgba(59,130,246,.35);color:var(--text)">2,130 + open-text (Beauty)</div><span style="font-size:11px;color:var(--muted)">12.9%</span></div>
+    <div class="funnel-step"><div class="funnel-bar" style="width:24%;background:var(--accent);color:#fff">1,966 qualified (2+ campaigns) ✓</div><span style="font-size:11px;color:var(--muted)">11.9%</span></div>
   </div>
 
-  <div class="dnote fade"><span style="font-size:15px;">⚠️</span><span>Date data มีใน <strong>3,556 คน</strong> จาก 16,557 (21%) — ผลลัพธ์เป็น subset ที่มี timestamp ครบ</span></div>
-
-  <div class="g3 fade">
-    <div class="sc"><div class="sc-lbl">Median avg gap</div><div class="sc-val g">13.6</div><div class="sc-sub">วัน ระหว่าง 2 session</div></div>
-    <div class="sc"><div class="sc-lbl">Mean avg gap</div><div class="sc-val">11.7</div><div class="sc-sub">วัน — skewed ต่ำกว่า median ผิดปกติ</div></div>
-    <div class="sc"><div class="sc-lbl">Std Deviation</div><div class="sc-val o">24.8</div><div class="sc-sub">วัน — behavior กระจายตัวสูงมาก</div></div>
+  <div class="grid g4" style="margin-bottom:24px">
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">หญิง</div><div style="font-size:20px;font-weight:600">1,562</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">ชาย</div><div style="font-size:20px;font-weight:600">370</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">มี Social</div><div style="font-size:20px;font-weight:600">45.9%</div><div style="font-size:11px;color:var(--muted)">903 คน</div></div>
+    <div class="card-sm"><div style="color:var(--muted);font-size:12px">สนใจรีวิว</div><div style="font-size:20px;font-weight:600">39.9%</div><div style="font-size:11px;color:var(--muted)">785 คน</div></div>
   </div>
+  <div class="insight">กลุ่มนี้มี <b>skincare insight เชิงลึก</b> (ปัญหาผิว, แบรนด์ที่ใช้, ความกังวล) พร้อม qualify เป็น tester ทันที — ไม่ต้องสัมภาษณ์เพิ่ม</div>
+</section>
 
-  <div class="g2 fade d1">
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Distribution ของ avg gap ต่อ user</div>
-      <div class="ps">n = 1,236 คน · avg gap &gt; 0</div>
-      <div class="hbg">
-        <div class="hbr"><span class="hbl">&lt;1 สัปดาห์</span><div class="hbt"><div class="hbf" data-w="20.3" style="width:0%;background:var(--tl);"></div></div><span class="hbp">20.3%</span><span class="hbn">251</span></div>
-        <div class="hbr"><span class="hbl">1–2 สัปดาห์</span><div class="hbt"><div class="hbf" data-w="31.3" style="width:0%;background:var(--g);"></div></div><span class="hbp" style="color:var(--g);font-weight:600;">31.3%</span><span class="hbn">387</span></div>
-        <div class="hbr"><span class="hbl">2–4 สัปดาห์</span><div class="hbt"><div class="hbf" data-w="29.0" style="width:0%;background:var(--g);opacity:.6;"></div></div><span class="hbp" style="font-weight:600;">29.0%</span><span class="hbn">359</span></div>
-        <div class="hbr"><span class="hbl">1–2 เดือน</span><div class="hbt"><div class="hbf" data-w="11.9" style="width:0%;background:var(--am);"></div></div><span class="hbp">11.9%</span><span class="hbn">147</span></div>
-        <div class="hbr"><span class="hbl">2–3 เดือน</span><div class="hbt"><div class="hbf" data-w="3.9" style="width:0%;background:var(--o);"></div></div><span class="hbp">3.9%</span><span class="hbn">48</span></div>
-        <div class="hbr"><span class="hbl">&gt;3 เดือน</span><div class="hbt"><div class="hbf" data-w="3.6" style="width:0%;background:#c8c5be;"></div></div><span class="hbp">3.6%</span><span class="hbn">44</span></div>
-      </div>
-      <div class="ins">60.3% กลับมาภายใน 1 เดือน → Monthly touchpoint เป็น cadence ที่เหมาะสมที่สุด</div>
+<!-- ==================== TIERS ==================== -->
+<section id="tiers">
+  <h2>Tier Breakdown & Scenario <span>แบ่ง qualified pool เป็น 3 ระดับ</span></h2>
+
+  <div class="grid g3" style="margin-bottom:24px">
+    <div class="tier-card" style="border-color:var(--gold)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:22px">🥇</span><span class="mono" style="font-size:28px;font-weight:700;color:var(--gold)">632</span></div>
+      <div style="font-size:14px;font-weight:500;margin:8px 0">Gold Tier</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">มี social + สนใจรีวิว + high confidence (4+ campaigns)<br>Avg effort: 49.9</div>
     </div>
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Avg gap แยกตาม Segment</div>
-      <div class="ps">พฤติกรรมต่างกันอย่างชัดเจน · n = 2,433 multi-session</div>
-      <div class="gap-g" style="margin-bottom:0;">
-        <div class="gap-c" style="border-color:#f0c9b0;"><div><span class="tag tc">Creator</span></div><div class="gap-val" style="color:var(--o);">9.8<span class="gap-unit"> วัน</span></div><div style="font-size:12px;color:var(--t3);">median · กลับมาสม่ำเสมอ<br>n = 1,069</div></div>
-        <div class="gap-c" style="border-color:#b3cef5;"><div><span class="tag tr2">Research</span></div><div class="gap-val" style="color:var(--b);">~0<span class="gap-unit"> วัน</span></div><div style="font-size:12px;color:var(--t3);">median · burst session<br>n = 1,284</div></div>
-        <div class="gap-c" style="border-color:#9fd9d2;"><div><span class="tag tt">Tester</span></div><div class="gap-val" style="color:var(--tl);">~0<span class="gap-unit"> วัน</span></div><div style="font-size:12px;color:var(--t3);">median · มักทำครั้งเดียว<br>n = 80</div></div>
-      </div>
-      <div class="ins tl" style="margin-top:14px;">💡 Mean ≠ Median ต่างกันมาก → Bimodal distribution: กลับเร็วมาก หรือหายไปนาน ไม่มีระหว่างกลาง</div>
+    <div class="tier-card" style="border-color:var(--silver)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:22px">🥈</span><span class="mono" style="font-size:28px;font-weight:700;color:var(--silver)">987</span></div>
+      <div style="font-size:14px;font-weight:500;margin:8px 0">Silver Tier</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">มี social หรือ สนใจรีวิว (อย่างใดอย่างหนึ่ง)<br>Avg effort: 34.4</div>
     </div>
-  </div>
-</div>
-
-<!-- QUALITY -->
-<div class="section" id="quality">
-  <div class="sh">
-    <div><div class="snum">Section 03c</div><h2 class="stitle">Engagement Quality</h2></div>
-    <div class="sdesc">ตอบแล้ว meaningful แค่ไหน?</div>
-  </div>
-  <div class="g4 fade">
-    <div class="sc"><div class="sc-lbl">Avg Engagement Rate</div><div class="sc-val">4.3%</div><div class="sc-sub">median 1.7% — skewed สูง</div></div>
-    <div class="sc"><div class="sc-lbl">Avg Completion Rate</div><div class="sc-val g">39.7%</div><div class="sc-sub">median 33.3%</div></div>
-    <div class="sc"><div class="sc-lbl">มี Open Text</div><div class="sc-val b">50.2%</div><div class="sc-sub">ของ interactions</div></div>
-    <div class="sc"><div class="sc-lbl">มี Social Content</div><div class="sc-val">6.0%</div><div class="sc-sub">ของ interactions</div></div>
-  </div>
-  <div class="panel fade d1">
-    <div class="pt">Engagement vs Completion Rate</div>
-    <div class="ps">ไม่ใช่สิ่งเดียวกัน — ปัญหาอยู่คนละจุด</div>
-    <div class="cw" style="height:150px;"><canvas id="qualChart"></canvas></div>
-    <div class="ins b">Engagement ≠ Completion — คนที่ "เข้ามาแล้ว" มักทำจบ (39.7%) ปัญหาคือ "ดึงให้เข้ามาครั้งแรก" ไม่ใช่ drop-off</div>
-  </div>
-</div>
-
-<!-- TOPICS -->
-<div class="section" id="topics">
-  <div class="sh">
-    <div><div class="snum">Section 04</div><h2 class="stitle">Topic Landscape</h2></div>
-    <div class="sdesc">16 topics · 43,708 events · 59 campaigns</div>
-  </div>
-  <div class="g2 fade">
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Events per Topic</div>
-      <div class="ps">จำนวน interactions ต่อหัวข้อ</div>
-      <div class="topic-list">
-        <div class="topic-row"><span class="topic-ico">🍔</span><span class="topic-lbl">Food</span><div class="topic-track"><div class="topic-fill" data-w="100" style="width:0%;background:var(--g);"></div></div><span class="topic-n">12,165</span></div>
-        <div class="topic-row"><span class="topic-ico">💊</span><span class="topic-lbl">Health</span><div class="topic-track"><div class="topic-fill" data-w="68.5" style="width:0%;background:var(--tl);"></div></div><span class="topic-n">8,330</span></div>
-        <div class="topic-row"><span class="topic-ico">✨</span><span class="topic-lbl">Beauty</span><div class="topic-track"><div class="topic-fill" data-w="57.1" style="width:0%;background:var(--p);"></div></div><span class="topic-n">6,942</span></div>
-        <div class="topic-row"><span class="topic-ico">🌐</span><span class="topic-lbl">Mixed</span><div class="topic-track"><div class="topic-fill" data-w="25" style="width:0%;background:var(--t3);"></div></div><span class="topic-n">3,040</span></div>
-        <div class="topic-row"><span class="topic-ico">📱</span><span class="topic-lbl">Social</span><div class="topic-track"><div class="topic-fill" data-w="24.5" style="width:0%;background:var(--b);"></div></div><span class="topic-n">2,982</span></div>
-        <div class="topic-row"><span class="topic-ico">💻</span><span class="topic-lbl">Tech</span><div class="topic-track"><div class="topic-fill" data-w="23.1" style="width:0%;background:var(--b);opacity:.6;"></div></div><span class="topic-n">2,805</span></div>
-        <div class="topic-row"><span class="topic-ico">🎬</span><span class="topic-lbl">Entertainment</span><div class="topic-track"><div class="topic-fill" data-w="16" style="width:0%;background:var(--am);"></div></div><span class="topic-n">1,948</span></div>
-        <div class="topic-row"><span class="topic-ico">💰</span><span class="topic-lbl">Finance</span><div class="topic-track"><div class="topic-fill" data-w="9.4" style="width:0%;background:var(--o);"></div></div><span class="topic-n">1,147</span></div>
-        <div class="topic-row"><span class="topic-ico">🏡</span><span class="topic-lbl">Lifestyle</span><div class="topic-track"><div class="topic-fill" data-w="8.8" style="width:0%;background:var(--g);opacity:.5;"></div></div><span class="topic-n">1,069</span></div>
-      </div>
-    </div>
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Beauty Topic — Social &amp; Review Signal</div>
-      <div class="ps">Beauty มี social + review rate สูงที่สุด แม้ events จะเป็นอันดับ 3</div>
-      <div class="cw" style="height:160px;"><canvas id="beautyChart"></canvas></div>
-      <div class="ins b">💡 <strong>Beauty</strong> มี social 17.2% + review 15.7% + open text 64.4% สูงสุดใน topic ทั้งหมด — เหมาะที่สุดสำหรับ product testing &amp; review campaign</div>
-    </div>
-  </div>
-  <div class="panel fade d1">
-    <div class="pt">Topic Chips</div>
-    <div class="ps">ทั้ง 16 หัวข้อ</div>
-    <div class="chip-g" id="topicChips"></div>
-  </div>
-</div>
-
-<!-- TARGETING -->
-<div class="section" id="targeting">
-  <div class="sh">
-    <div><div class="snum">Section 05</div><h2 class="stitle">Skincare Use Case · Targeting</h2></div>
-    <div class="sdesc">Qualification Funnel · Beauty Campaign</div>
-  </div>
-
-  <div class="g2 fade">
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Qualification Funnel · Beauty Campaign</div>
-      <div class="ps">กรอง step by step จาก 16,557 คน สู่ qualified pool</div>
-      <div class="funnel">
-        <div class="funnel-step">
-          <div class="funnel-dot" style="background:#c8c5be;"></div>
-          <div class="funnel-lbl">ทั้งหมด</div>
-          <div><span class="funnel-n">16,557</span><span class="funnel-pct">100%</span></div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar-fill" data-w="100" style="width:0%;background:#c8c5be;"></div></div>
-        </div>
-        <div class="funnel-arrow">↓ Beauty campaign</div>
-        <div class="funnel-step">
-          <div class="funnel-dot" style="background:var(--p);"></div>
-          <div class="funnel-lbl">Beauty campaign</div>
-          <div><span class="funnel-n">4,429</span><span class="funnel-pct">26.7%</span></div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar-fill" data-w="26.7" style="width:0%;background:var(--p);"></div></div>
-        </div>
-        <div class="funnel-arrow">↓ + PDPA explicit</div>
-        <div class="funnel-step">
-          <div class="funnel-dot" style="background:var(--b);"></div>
-          <div class="funnel-lbl">+ PDPA explicit</div>
-          <div><span class="funnel-n">3,391</span><span class="funnel-pct">20.5%</span></div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar-fill" data-w="20.5" style="width:0%;background:var(--b);"></div></div>
-        </div>
-        <div class="funnel-arrow">↓ + มี open text</div>
-        <div class="funnel-step">
-          <div class="funnel-dot" style="background:var(--am);"></div>
-          <div class="funnel-lbl">+ open text</div>
-          <div><span class="funnel-n">2,130</span><span class="funnel-pct">12.9%</span></div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar-fill" data-w="12.9" style="width:0%;background:var(--am);"></div></div>
-        </div>
-        <div class="funnel-arrow">↓ + 2+ campaigns</div>
-        <div class="funnel-step" style="background:var(--gbg);border-radius:8px;padding:14px 0;padding-left:0;">
-          <div class="funnel-dot" style="background:var(--g);"></div>
-          <div class="funnel-lbl"><strong>QUALIFIED POOL ✓</strong></div>
-          <div><span class="funnel-n" style="color:var(--g);">1,966</span><span class="funnel-pct">11.9%</span></div>
-          <div class="funnel-bar-wrap"><div class="funnel-bar-fill" data-w="11.9" style="width:0%;background:var(--g);"></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:0;">
-      <div class="pt">Qualified Pool Profile · n = 1,966</div>
-      <div class="ps">ข้อมูลเชิงลึกของกลุ่มที่ผ่าน qualification</div>
-      <div class="g2" style="margin-bottom:14px;">
-        <div class="pstat"><div class="pstat-lbl">หญิง</div><div class="pstat-val" style="color:var(--p);">1,562</div></div>
-        <div class="pstat"><div class="pstat-lbl">ชาย</div><div class="pstat-val" style="color:var(--b);">370</div></div>
-      </div>
-      <div class="hbg">
-        <div class="hbr"><span class="hbl sm">มี social</span><div class="hbt"><div class="hbf" data-w="45.9" style="width:0%;background:var(--o);"></div></div><span class="hbp" style="color:var(--o);font-weight:600;">45.9%</span><span class="hbn">903</span></div>
-        <div class="hbr"><span class="hbl sm">สนใจรีวิว</span><div class="hbt"><div class="hbf" data-w="39.9" style="width:0%;background:var(--b);"></div></div><span class="hbp" style="color:var(--b);font-weight:600;">39.9%</span><span class="hbn">785</span></div>
-      </div>
-      <div class="ins" style="margin-top:14px;">💡 กลุ่มนี้มี skincare insight เชิงลึก พร้อม qualify เป็น tester ทันที — ไม่ต้องสัมภาษณ์เพิ่ม</div>
-    </div>
-  </div>
-</div>
-
-<!-- TIERS -->
-<div class="section" id="tiers">
-  <div class="sh">
-    <div><div class="snum">Section 05b</div><h2 class="stitle">Tier Breakdown &amp; Scenario</h2></div>
-    <div class="sdesc">แบ่ง qualified pool เป็น 3 ระดับ<br>ตาม quality signal</div>
-  </div>
-
-  <div class="tier-grid fade">
-    <div class="tier-card tier-gold">
-      <div class="tier-icon">🥇</div>
-      <div class="tier-n" style="color:#b45309;">657</div>
-      <div class="tier-lbl">Gold Tier</div>
-      <div class="tier-sub">มี social + สนใจรีวิว + high confidence (4+ campaigns)<br>Avg effort: 46.9</div>
-    </div>
-    <div class="tier-card tier-silver">
-      <div class="tier-icon">🥈</div>
-      <div class="tier-n" style="color:#475569;">321</div>
-      <div class="tier-lbl">Silver Tier</div>
-      <div class="tier-sub">มี social หรือ สนใจรีวิว (อย่างใดอย่างหนึ่ง)<br>Avg effort: 43.6</div>
-    </div>
-    <div class="tier-card tier-bronze">
-      <div class="tier-icon">🥉</div>
-      <div class="tier-n" style="color:#92400e;">988</div>
-      <div class="tier-lbl">Bronze Tier</div>
-      <div class="tier-sub">ผ่าน qualified แต่ไม่มี social signal<br>Avg effort: 36.2</div>
+    <div class="tier-card" style="border-color:var(--bronze)">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:22px">🥉</span><span class="mono" style="font-size:28px;font-weight:700;color:var(--bronze)">347</span></div>
+      <div style="font-size:14px;font-weight:500;margin:8px 0">Bronze Tier</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">ผ่าน qualified แต่ไม่มี social signal<br>Avg effort: 43.6</div>
     </div>
   </div>
 
-  <div class="panel fade d1">
-    <div class="pt">Scenario: Go / No-Go Decision</div>
-    <div class="ps">ออกแบบ wave ทดสอบจาก qualified pool</div>
-    <div class="scenario">
-      <div class="scenario-item" style="border-color:#fcd34d;background:#fffbeb;">
-        <div class="scenario-label">WAVE 1 · Gold</div>
-        <div class="scenario-val" style="color:#b45309;">50</div>
-        <div class="scenario-sub">สินค้า + ประเมิน</div>
-      </div>
-      <div class="scenario-item" style="border-color:#cbd5e1;background:#f8fafc;">
-        <div class="scenario-label">WAVE 2 · Silver</div>
-        <div class="scenario-val" style="color:#475569;">70</div>
-        <div class="scenario-sub">ประเมินอย่างเดียว</div>
-      </div>
-      <div class="scenario-item" style="background:var(--gbg);border-color:#a3cfb8;">
-        <div class="scenario-label">Expected completed</div>
-        <div class="scenario-val" style="color:var(--g);">~72</div>
-        <div class="scenario-sub">120 × 60% accept rate</div>
-      </div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:500;margin-bottom:16px">Scenario: Go / No-Go Decision</div>
+    <div class="grid g3" style="margin-bottom:16px">
+      <div class="card-sm" style="text-align:center;border:1px solid var(--gold)"><div style="font-size:11px;color:var(--muted)">WAVE 1 · Gold</div><div class="mono" style="font-size:28px;font-weight:700;margin:4px 0">50</div><div style="font-size:11px;color:var(--muted)">สินค้า + ประเมิน</div></div>
+      <div class="card-sm" style="text-align:center;border:1px solid var(--silver)"><div style="font-size:11px;color:var(--muted)">WAVE 2 · Silver</div><div class="mono" style="font-size:28px;font-weight:700;margin:4px 0">70</div><div style="font-size:11px;color:var(--muted)">ประเมินอย่างเดียว</div></div>
+      <div class="card-sm" style="text-align:center;border:1px solid var(--accent)"><div style="font-size:11px;color:var(--muted)">Expected completed</div><div class="mono" style="font-size:28px;font-weight:700;margin:4px 0">~72</div><div style="font-size:11px;color:var(--muted)">120 × 60% accept</div></div>
     </div>
-    <div class="outcome-grid">
-      <div class="outcome-item outcome-go"><div class="outcome-icon">✅</div><div class="outcome-lbl">GO</div><div class="outcome-cond">avg ≥ 4.0 · pos ≥ 70%</div></div>
-      <div class="outcome-item outcome-iter"><div class="outcome-icon">🔄</div><div class="outcome-lbl">ITERATE</div><div class="outcome-cond">avg 3.0 – 3.9</div></div>
-      <div class="outcome-item outcome-nogo"><div class="outcome-icon">❌</div><div class="outcome-lbl">NO-GO</div><div class="outcome-cond">avg &lt; 3.0</div></div>
+    <div class="grid g3">
+      <div class="card-sm" style="text-align:center;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)"><div style="font-size:16px;font-weight:600;color:var(--green)">GO ✓</div><div style="font-size:11px;color:var(--muted)">avg ≥ 4.0 · pos ≥ 70%</div></div>
+      <div class="card-sm" style="text-align:center;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)"><div style="font-size:16px;font-weight:600;color:var(--amber)">ITERATE ⟳</div><div style="font-size:11px;color:var(--muted)">avg 3.0 – 3.9</div></div>
+      <div class="card-sm" style="text-align:center;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)"><div style="font-size:16px;font-weight:600;color:var(--red)">NO-GO ✗</div><div style="font-size:11px;color:var(--muted)">avg < 3.0</div></div>
     </div>
   </div>
-</div>
 
-<div class="footer">
-  <div class="footer-note">Data source: MASTER_FULL.xlsx · Jan 2025 – Dec 2025 · 59 Campaigns<br>⚠ Date-based metrics ใช้ subset 3,556 คน ที่มี timestamp ครบ</div>
-  <div class="footer-mono">Community Intelligence · Survey Intel</div>
-</div>
+  <div style="margin-top:40px;text-align:center;color:var(--muted);font-size:12px;padding:20px;border-top:1px solid var(--border)">
+    Data source: MASTER_FULL.xlsx · Jan 2025 – Mar 2026 · 59 Campaigns · 16,557 Users<br>
+    ⚠ Date-based metrics ใช้ subset 2,390 คน ที่มี timestamp ครบ (29% of events)
+  </div>
+</section>
 
-</div><!-- /main -->
-</div><!-- /layout -->
+</main>
 
 <script>
-// Topic chips
-const topics=[
-  {l:'Food',n:12165,c:'#2d6a4f'},{l:'Health',n:8330,c:'#1a6b73'},{l:'Beauty',n:6942,c:'#9d2d5e'},
-  {l:'Mixed',n:3040,c:'#5a5750'},{l:'Social',n:2982,c:'#2563a8'},{l:'Tech',n:2805,c:'#374151'},
-  {l:'Entertainment',n:1948,c:'#92610a'},{l:'Finance',n:1147,c:'#c05621'},{l:'Lifestyle',n:1069,c:'#2d6a4f'},
-  {l:'Pet',n:832,c:'#1a6b73'},{l:'Shopping',n:794,c:'#9d2d5e'},{l:'Feedback',n:650,c:'#5a5750'},
-  {l:'Career',n:378,c:'#2563a8'},{l:'Travel',n:365,c:'#374151'},{l:'Parenting',n:253,c:'#92610a'},{l:'Influencer',n:19,c:'#c05621'},
-];
-const tc=document.getElementById('topicChips');
-topics.forEach(t=>{
-  const el=document.createElement('span');el.className='chip';
-  el.innerHTML=t.l+' <span class="chip-n">'+t.n.toLocaleString()+'</span>';
-  el.addEventListener('mouseenter',()=>{el.style.borderColor=t.c;el.style.color=t.c;});
-  el.addEventListener('mouseleave',()=>{el.style.borderColor='';el.style.color='';});
-  tc.appendChild(el);
+// Navigation active state
+const links = document.querySelectorAll('nav a');
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  links.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
 });
 
-// Scroll reveal
-const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v');});},{threshold:0.06});
-document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
-
-// Animate all fills
-setTimeout(()=>{
-  document.querySelectorAll('[data-w]').forEach(el=>{el.style.width=el.getAttribute('data-w')+'%';});
-},350);
-
-// Sidebar active on scroll
-const sobs=new IntersectionObserver(e=>{
-  e.forEach(x=>{
-    if(x.isIntersecting){
-      document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
-      const t=document.querySelector('.sb-link[href="#'+x.target.id+'"]');
-      if(t)t.classList.add('active');
-    }
-  });
-},{threshold:0.25});
-document.querySelectorAll('[id]').forEach(s=>sobs.observe(s));
-
-// Tab scroll
-function scrollTo(id){const el=document.querySelector(id);if(el)el.scrollIntoView({behavior:'smooth'});}
-document.querySelectorAll('.top-tab').forEach((btn,i)=>{
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.top-tab').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-  });
+// Age chart
+new Chart(document.getElementById('ageChart'), {
+  type: 'bar',
+  data: {
+    labels: ['<18','18-25','26-35','36-45','46-55','55+'],
+    datasets: [{ data: [291,3075,4847,4580,2419,1298], backgroundColor: ['#64748b','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#64748b'], borderRadius: 4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(148,163,184,.1)'}}} }
 });
 
-Chart.defaults.color='#9a9790';
-Chart.defaults.font.family="'IBM Plex Mono',monospace";
-
-// Quality
-new Chart(document.getElementById('qualChart'),{
-  type:'bar',
-  data:{labels:['Engagement (Avg)','Engagement (Median)','Completion (Avg)','Completion (Median)'],
-    datasets:[{data:[4.3,1.7,39.7,33.3],
-      backgroundColor:['#93c4f5','#c5defa','#6ab894','#a7d8bc'],
-      borderRadius:4,borderSkipped:false}]},
-  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.x.toFixed(1)+'%'}}},
-    scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>v+'%',font:{size:11}},max:50},
-      y:{grid:{display:false},ticks:{font:{size:11}}}}}
+// Gap chart
+new Chart(document.getElementById('gapChart'), {
+  type: 'bar',
+  data: {
+    labels: ['0d','1-7d','8-14d','15-30d','31-60d','61-90d','91-180d','180d+'],
+    datasets: [{ data: [84,135,83,270,281,145,115,21], backgroundColor: ['#22c55e','#22c55e','#f59e0b','#f59e0b','#ef4444','#ef4444','#991b1b','#991b1b'], borderRadius: 3 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#94a3b8',font:{size:10},maxRotation:45},grid:{display:false}},y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(148,163,184,.1)'}}} }
 });
 
-// Beauty signals
-new Chart(document.getElementById('beautyChart'),{
-  type:'bar',
-  data:{labels:['Has Social','Has Review Exp','Has Open Text'],
-    datasets:[{
-      label:'Beauty topic',data:[17.2,15.7,64.4],
-      backgroundColor:['#e8a0bf','#c97ba0','#a3527a'],
-      borderRadius:4,borderSkipped:false
-    },{
-      label:'Overall avg',data:[6.0,5.0,50.2],
-      backgroundColor:['rgba(0,0,0,0.08)','rgba(0,0,0,0.08)','rgba(0,0,0,0.08)'],
-      borderRadius:4,borderSkipped:false
-    }]},
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:10,boxHeight:10}}},
-    scales:{x:{grid:{display:false},ticks:{font:{size:11}}},
-      y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{callback:v=>v+'%',font:{size:11}},max:80}}}
+// Topic chart
+new Chart(document.getElementById('topicChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Food','Health','Beauty','Mixed','Social','Tech','Entertainment','Finance','Lifestyle'],
+    datasets: [{ data: [12162,8329,6939,3039,2982,2802,1948,1147,1069], backgroundColor: ['#f97316','#14b8a6','#ec4899','#64748b','#3b82f6','#a78bfa','#64748b','#64748b','#64748b'], borderRadius: 4 }]
+  },
+  options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{color:'rgba(148,163,184,.1)'}},y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{display:false}}} }
 });
 </script>
 </body>
